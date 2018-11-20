@@ -14,21 +14,28 @@
   <body>
     <div id="root"></div>
     <script type="text/babel">
+
     class Navbar extends React.Component {
+      constructor(props){
+        super(props)
+      }
+      change(page){
+        this.props.change(page)
+      }
       render(){
         return(
         <nav className="navbar navbar-default">
           <div className="container">
             <div className="navbar-header">
               <a className="navbar-brand" href="#!">
-              React-Bootstrap
+              {this.props.brand}
               </a>
             </div>
             <div id="navbar">
               <ul className="nav navbar-nav">
-                <li className="active"><a  href="#!">Home</a></li>
-                <li><a  href="#!">About</a></li>
-                <li><a  href="#!">Content</a></li>
+                <li className={(this.props.currentPage === 'home') ? 'active' : ''}><a onClick={this.change.bind(this, 'home')}  href="#!">Home</a></li>
+                <li className={(this.props.currentPage === 'about') ? 'active' : ''}><a  onClick={this.change.bind(this, 'about')} href="#!">About</a></li>
+                <li className={(this.props.currentPage === 'content') ? 'active' : ''}><a  onClick={this.change.bind(this, 'content')} href="#!">Content</a></li>
               </ul>
             </div>
           </div>
@@ -36,14 +43,16 @@
           )
       }
     }
+
     class Jumbotron extends React.Component {
       render(){
         return(
         
         <div className="jumbotron">
           <div className="container">
-            <h1>Hello, world!</h1>
-            <p className="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.
+            <h1>{this.props.heading}</h1>
+            <p className="lead">
+              {this.props.text}
             </p>
             <p>
              <a className="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
@@ -56,26 +65,61 @@
     }
     class Page extends React.Component {
       render(){
+        let pageContent;
+        if(this.props.currentPage ==='home'){
+          pageContent = 'This is the home page'
+        } else if(this.props.currentPage ==='about'){
+          pageContent = 'This is the about page'
+        } else if(this.props.currentPage ==='content'){
+          pageContent = 'This is the content page'
+        } else {
+          pageContent = 'This is the home page'
+        }
         return(
           <div>
             <div className="container">
-              This is the home page.
+              <h2>{this.props.currentPage.charAt(0).toUpperCase() + this.props.currentPage.slice(1)}</h2>
+              <p>{pageContent}</p>
             </div>
           </div>
           )
       }
     }
     class Theme extends React.Component {
+      constructor(props){
+        super(props)
+        this.state={
+          currentPage:'home'
+        }
+      }
+      handleChange(page){
+        this.setState({
+          currentPage: page
+        })
+      }
       render(){
+        var jumbotron;
+        if(this.state.currentPage === 'home'){
+          jumbotron = <Jumbotron heading={this.props.heading} text={this.props.text}/>
+        }
+          else {
+           jumbotron = ''; 
+          }
         return(
           <div>
-            <Navbar />
-            <Jumbotron />
-            <Page />
+            <Navbar currentPage={this.state.currentPage} brand={this.props.brand} change={this.handleChange.bind(this)}/>
+            {jumbotron}
+            <Page currentPage={this.state.currentPage} />
           </div>
           )
       }
     }
+      Theme.defaultProps = {
+        brand:'React-Bootstrap',
+        heading:'Hello, world!',
+        text:'This is a simple page with React and Bootstrap.'
+      }
+
       ReactDOM.render(
         <div>
           <Theme />
